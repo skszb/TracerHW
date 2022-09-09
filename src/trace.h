@@ -38,6 +38,8 @@ public:
 class Surface {
 public:
     virtual bool intersect(const Ray &r, double t0, double t1, HitRecord &hr) const = 0;
+    // virtual SlVector3 minPos() = 0;
+    // virtual SlVector3 maxPos() = 0;
     virtual ~Surface() {};
 };
 

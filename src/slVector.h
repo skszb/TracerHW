@@ -103,7 +103,7 @@ public:
     inline double &operator()(unsigned int i)      ;
     inline double  operator()(unsigned int i) const;
 
-    inline double x() const;
+    inline double  x() const;
     inline double y() const;
     inline double z() const;
 
