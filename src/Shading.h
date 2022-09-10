@@ -5,7 +5,7 @@
 #include "trace.h"
 #include <cmath>
 
-static const double ka = 0.2;
+static const double ka = 0.1;
 
 class Shading {
 public:
@@ -14,7 +14,7 @@ public:
         SlVector3 color{};
         SlVector3 lDir = pl.p - hr.p;
         normalize(lDir);
-        double cosTheta = std::abs(dot(hr.n, lDir));
+        double cosTheta = dot(hr.n, lDir);
         // diffuse
         SlVector3 Kd = hr.f.kd * hr.f.color;
         color += Kd * pl.c * std::max(cosTheta, 0.0);
@@ -32,8 +32,6 @@ public:
 
         return color;
     }
-
-    static SlVector3 toneMap();
 };
 
 

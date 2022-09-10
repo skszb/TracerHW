@@ -81,7 +81,7 @@ public:
     ~Tracer();
     void traceImage();
     SlVector3 trace(const Ray &ray, double t0, double t1) const;
-    SlVector3 shade(const HitRecord &hr) const;
+    SlVector3 shade(HitRecord &hr) const;
     void writeImage(const std::string &fname);
 
     bool color;

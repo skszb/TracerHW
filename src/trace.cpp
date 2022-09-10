@@ -6,6 +6,7 @@
 #include <getopt.h>
 #include <cfloat>
 #include <vector>
+#include <chrono>
 #include <functional>
 
 #ifdef __APPLE__
@@ -35,8 +36,6 @@ bool Triangle::intersect(const Ray &r, double t0, double t1, HitRecord &hr) cons
     SlVector3 V3minusV1 = this->c - this->a;
     SlVector3 AminusV1 = r.e - this->a;
 
-    //SlVector3 matT[3] = {V2minusV1, V3minusV1, -r.d};
-
     // solve system of equations using matrix
     double adj[3][3];
     double det;
@@ -47,6 +46,7 @@ bool Triangle::intersect(const Ray &r, double t0, double t1, HitRecord &hr) cons
     adj[2][0] = V2minusV1[1] * V3minusV1[2] - V3minusV1[1] * V2minusV1[2];
 
     det = V2minusV1[0] * adj[0][0] + V3minusV1[0] * adj[1][0] + -r.d[0] * adj[2][0];
+
     if (det == 0) {
         return false;
     }
@@ -54,11 +54,9 @@ bool Triangle::intersect(const Ray &r, double t0, double t1, HitRecord &hr) cons
     adj[0][1] = -r.d[0] * V3minusV1[2] - V3minusV1[0] * -r.d[2];
     adj[1][1] = V2minusV1[0] * -r.d[2] - V2minusV1[2] * -r.d[0];
     adj[2][1] = V3minusV1[0] * V2minusV1[2] - V2minusV1[0] * V3minusV1[2];
-
     adj[0][2] = V3minusV1[0] * -r.d[1] - -r.d[0] * V3minusV1[1];
     adj[1][2] = -r.d[0] * V2minusV1[1] - V2minusV1[0] * -r.d[1];
     adj[2][2] = V2minusV1[0] * V3minusV1[1] - V3minusV1[0] * V2minusV1[1];
-
 
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
@@ -287,7 +285,6 @@ Tracer::Tracer(const std::string &fname) {
     samples = 1;
     aperture = 0.0;
 
-
 }
 
 
@@ -297,9 +294,9 @@ Tracer::~Tracer() {
 }
 
 
-SlVector3 Tracer::shade(const HitRecord &hr) const {
+SlVector3 Tracer::shade(HitRecord &hr) const {
     if (color) return hr.f.color;
-    if (hr.raydepth >= maxraydepth) return {};
+    if (hr.raydepth > maxraydepth) return {};
 
     SlVector3 color(0.0);
     HitRecord dummy;
@@ -326,12 +323,13 @@ SlVector3 Tracer::shade(const HitRecord &hr) const {
     }
 
     // Step 4 Add code for computing reflection color here
+    hr.raydepth += 1;
     Light refLight;
-    SlVector3 refDir = -hr.v+ 2.0 * hr.n * std::abs(dot(hr.n, hr.v));
+    SlVector3 refDir = -hr.v + 2.0 * hr.n * dot(hr.n, hr.v);
     Ray reflectRay = Ray(hr.p, refDir); // normalize?
     refLight.c = trace(reflectRay, shadowbias, MAX);
     refLight.p = hr.p + refDir;
-    color += Shading::phong(refLight, hr);
+    color += hr.f.ks * Shading::phong(refLight, hr);
 
     // Step 5 Add code for computing refraction color here
 
@@ -458,12 +456,14 @@ int main(int argc, char *argv[]) {
         for (unsigned int i = 0; i < argc; i++) std::cout << argv[i] << std::endl;
         exit(0);
     }
-
     Tracer tracer(argv[optind++]);
     tracer.aperture = aperture;
     tracer.samples = samples;
     tracer.color = color;
     tracer.maxraydepth = maxraydepth;
+    auto beginOfRendering = std::chrono::steady_clock::now();
     tracer.traceImage();
+    auto endOfRendering = std::chrono::steady_clock::now();
+    std::cout << "Rendering Time:"<< std::chrono::duration_cast<std::chrono::seconds>(endOfRendering - beginOfRendering).count() << "s\n";
     tracer.writeImage(argv[optind++]);
 };
