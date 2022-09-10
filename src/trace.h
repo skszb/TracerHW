@@ -75,9 +75,13 @@ public:
     SlVector3 center();
 };
 
-struct AABB {
+class AABB {
+public:
+    AABB() = default;
+    bool intersect(const Ray &r, double t0, double t1, HitRecord &hr) const;
     SlVector3 minCorner;
     SlVector3 maxCorner;
+
 };
 
 struct Node {

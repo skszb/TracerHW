@@ -82,6 +82,35 @@ Node* BuildNode(const std::vector<std::pair<Surface *, Fill> >& surfaces) {
     return node;
 }
 
+bool AABB::intersect(const Ray &r, double t0, double t1, HitRecord &hr) const {
+    this->minCorner;
+    this->maxCorner;
+    // x
+    double tmin = (minCorner.x() - r.e.x()) / r.d.x();
+    double tmax = (maxCorner.x() - r.e.x()) / r.d.x();
+    if (tmin > tmax) std::swap(tmin, tmax);
+
+    // y
+    double tymin = (minCorner.y() - r.e.y()) / r.d.y();
+    double tymax = (maxCorner.y() - r.e.y()) / r.d.y();
+    if (tymin > tymax) std::swap(tymin, tymax);
+    if (tymax < tmin || tymin > tmax) return false;
+    tmin = std::min(tmin, tymin);
+    tmax = std::max(tmax, tymax);
+
+    // z
+    double tzmin = (minCorner.z() - r.e.z()) / r.d.z();
+    double tzmax = (maxCorner.z() - r.e.z()) / r.d.z();
+    if (tzmin > tzmax) std::swap(tzmin, tzmax);
+    if (tzmax < tmin || tzmin > tmax) return false;
+    tmin = std::min(tmin, tzmin);
+    tmax = std::max(tmax, tzmax);
+
+    if (tmin < t0 || tmax > t1) return false;
+    hr.t = tmin;
+    return true;
+}
+
 
 bool Triangle::intersect(const Ray &r, double t0, double t1, HitRecord &hr) const {
     // Step 1 Ray-triangle test
