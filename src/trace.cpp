@@ -7,7 +7,6 @@
 #include <cfloat>
 #include <vector>
 #include <chrono>
-#include <functional>
 #include <cassert>
 
 #ifdef __APPLE__
@@ -470,6 +469,7 @@ SlVector3 Tracer::trace(const Ray &r, double t0, double t1) const {
     bool hit = false;
 
     // Step 1 See what a ray hits
+
     for (const std::pair<Surface *, Fill> &sf: surfaces) {
         if (sf.first->intersect(r, t0, t1, hr)) {
             hit = true;
@@ -553,6 +553,10 @@ void Tracer::writeImage(const std::string &fname) {
 
 void Tracer::buildBVHTree() {
     BVHTreeRoot = BuildNode(surfaces);
+}
+
+bool Tracer::traverseBVH() {
+
 }
 
 int main(int argc, char *argv[]) {
