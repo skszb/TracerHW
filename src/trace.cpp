@@ -8,6 +8,7 @@
 #include <vector>
 #include <chrono>
 #include <functional>
+#include <cassert>
 
 #ifdef __APPLE__
 #define MAX std::numeric_limits<double>::max()
@@ -27,6 +28,59 @@ double det(const SlVector3 &a, const SlVector3 &b, const SlVector3 &c) {
 }
 
 inline double sqr(double x) { return x * x; }
+
+Node* BuildNode(const std::vector<std::pair<Surface *, Fill> >& surfaces) {
+    // Create a node with a bounding box and all surfaces within it, then recursively divide the bounding box
+    // in two of the half size as the child nodes.
+    if (surfaces.empty()) return nullptr;
+    Node *node = new Node();
+
+    // surfaces
+    node->sfs = surfaces;
+
+    SlVector3 minCenter = surfaces[0].first->center();
+    SlVector3 maxCenter = minCenter;
+    // bounding box
+    AABB *box = new AABB();
+    box->minCorner = surfaces[0].first->minPos();
+    box->maxCorner = surfaces[0].first->maxPos();
+    for (int i = 1; i < surfaces.size(); i++) {
+        Surface *sf = surfaces[i].first;
+        minCenter = min(minCenter, sf->center());
+        maxCenter = max(maxCenter, sf->center());
+        box->minCorner = min(box->minCorner, sf->minPos());
+        box->maxCorner = max(box->maxCorner, sf->maxPos());
+    }
+    node->box = box;
+
+    // stop recursion if is a leaf node
+    if (surfaces.size() == 1) {
+        return node;
+    }
+
+    // left node and right node
+    std::vector<std::pair<Surface *, Fill> > lSfs;
+    std::vector<std::pair<Surface *, Fill> >rSfs;
+    SlVector3 dif = maxCenter - minCenter;
+    int longestAxis = 0;
+    for (int i = 1 ; i < 3; i++) {
+        if (dif[i] > dif[longestAxis])
+            longestAxis = i;
+    }
+    double mid = (minCenter[longestAxis] + maxCenter[longestAxis]) / 2;
+    for (const auto & p : surfaces) {
+        if (p.first->center()[longestAxis] < mid) {
+            lSfs.push_back(p);
+        } else {
+            rSfs.push_back(p);
+        }
+    }
+    assert(!lSfs.empty() && !rSfs.empty());
+    node->lNode = BuildNode(lSfs);
+    node->rNode = BuildNode(rSfs);
+
+    return node;
+}
 
 
 bool Triangle::intersect(const Ray &r, double t0, double t1, HitRecord &hr) const {
@@ -85,6 +139,26 @@ bool Triangle::intersect(const Ray &r, double t0, double t1, HitRecord &hr) cons
     return false;
 }
 
+SlVector3 Triangle::minPos() {
+    return {
+            std::min(std::min(a.x(), b.x()), c.x()),
+            std::min(std::min(a.y(), b.y()), c.y()),
+            std::min(std::min(a.z(), b.z()), c.z())
+    };
+}
+
+SlVector3 Triangle::maxPos() {
+    return {
+            std::max(std::max(a.x(), b.x()), c.x()),
+            std::max(std::max(a.y(), b.y()), c.y()),
+            std::max(std::max(a.z(), b.z()), c.z())
+    };
+}
+
+SlVector3 Triangle::center() {
+    return (a + b + c) / 3;
+}
+
 
 bool TrianglePatch::intersect(const Ray &r, double t0, double t1, HitRecord &hr) const {
     bool temp = Triangle::intersect(r, t0, t1, hr);
@@ -141,6 +215,27 @@ bool Sphere::intersect(const Ray &r, double t0, double t1, HitRecord &hr) const 
     return false;
 }
 
+SlVector3 Sphere::minPos() {
+    return {
+            c.x() - rad,
+            c.y() - rad,
+            c.z() - rad
+    };
+}
+
+SlVector3 Sphere::maxPos() {
+    return {
+            c.x() + rad,
+            c.y() + rad,
+            c.z() + rad
+    };
+}
+
+SlVector3 Sphere::center() {
+    return this->c;
+}
+
+
 
 Tracer::Tracer(const std::string &fname) {
     std::ifstream in(fname.c_str(), std::ios_base::in);
@@ -149,6 +244,7 @@ Tracer::Tracer(const std::string &fname) {
     Fill fill;
     bool coloredlights = false;
     while (in) {
+        if (in.eof()) break;
         getline(in, line);
         switch (line[0]) {
             case 'b': {
@@ -284,13 +380,13 @@ Tracer::Tracer(const std::string &fname) {
     shadowbias = 1e-6;
     samples = 1;
     aperture = 0.0;
-
 }
 
 
 Tracer::~Tracer() {
     if (im) delete[] im;
     for (unsigned int i = 0; i < surfaces.size(); i++) delete surfaces[i].first;
+    FreeNode(this->BVHTreeRoot);
 }
 
 
@@ -426,6 +522,9 @@ void Tracer::writeImage(const std::string &fname) {
     out.close();
 }
 
+void Tracer::buildBVHTree() {
+    BVHTreeRoot = BuildNode(surfaces);
+}
 
 int main(int argc, char *argv[]) {
     int c;
@@ -461,9 +560,16 @@ int main(int argc, char *argv[]) {
     tracer.samples = samples;
     tracer.color = color;
     tracer.maxraydepth = maxraydepth;
+
+    auto beginOfBuildingTree = std::chrono::steady_clock::now();
+    tracer.buildBVHTree();
+    auto endOfBuildingTree = std::chrono::steady_clock::now();
+    std::cout << "BVH Tree Creating Time:"<< std::chrono::duration_cast<std::chrono::seconds>(endOfBuildingTree - beginOfBuildingTree).count() << "s\n";
+
     auto beginOfRendering = std::chrono::steady_clock::now();
     tracer.traceImage();
     auto endOfRendering = std::chrono::steady_clock::now();
     std::cout << "Rendering Time:"<< std::chrono::duration_cast<std::chrono::seconds>(endOfRendering - beginOfRendering).count() << "s\n";
+
     tracer.writeImage(argv[optind++]);
 };

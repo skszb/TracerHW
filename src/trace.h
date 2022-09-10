@@ -2,6 +2,7 @@
 #define TRACE_H
 
 #include "slVector.h"
+
 #include <vector>
 
 class Ray {
@@ -38,8 +39,9 @@ public:
 class Surface {
 public:
     virtual bool intersect(const Ray &r, double t0, double t1, HitRecord &hr) const = 0;
-    // virtual SlVector3 minPos() = 0;
-    // virtual SlVector3 maxPos() = 0;
+    virtual SlVector3 minPos() = 0;
+    virtual SlVector3 maxPos() = 0;
+    virtual SlVector3 center() = 0;
     virtual ~Surface() {};
 };
 
@@ -48,6 +50,9 @@ class Triangle : public Surface {
 public:
     Triangle(const SlVector3 &_a, const SlVector3 &_b, const SlVector3 &_c) : a(_a), b(_b), c(_c) {};
     virtual bool intersect(const Ray &r, double t0, double t1, HitRecord &hr) const;
+    SlVector3 minPos();
+    SlVector3 maxPos();
+    SlVector3 center();
 };
 
 class TrianglePatch : public Triangle {
@@ -65,7 +70,31 @@ class Sphere : public Surface {
 public:
     Sphere(const SlVector3 &_c, double _r) : c(_c), rad(_r) {};
     bool intersect(const Ray &r, double t0, double t1, HitRecord &hr) const;
+    SlVector3 minPos();
+    SlVector3 maxPos();
+    SlVector3 center();
 };
+
+struct AABB {
+    SlVector3 minCorner;
+    SlVector3 maxCorner;
+};
+
+struct Node {
+    AABB *box;
+    Node* lNode = nullptr;
+    Node* rNode = nullptr;
+    std::vector<std::pair<Surface *, Fill> > sfs;
+};
+
+Node* BuildNode(const std::vector<std::pair<Surface *, Fill> >& surfaces);
+
+void FreeNode(Node* nd) {
+    if (!nd) return;
+    free(nd->box);
+    FreeNode(nd->lNode);
+    FreeNode(nd->rNode);
+}
 
 class Tracer {
     SlVector3 bcolor, eye, at, up;
@@ -83,11 +112,13 @@ public:
     SlVector3 trace(const Ray &ray, double t0, double t1) const;
     SlVector3 shade(HitRecord &hr) const;
     void writeImage(const std::string &fname);
+    void buildBVHTree();
 
     bool color;
     int samples;
     double aperture;
     int maxraydepth;
+    Node* BVHTreeRoot = nullptr;
 };
 
 #endif
