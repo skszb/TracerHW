@@ -431,7 +431,7 @@ SlVector3 Tracer::shade(HitRecord &hr) const {
         bool shadow = false;
 
         // Step 3 Check for shadows here
-        SlVector3 SrftoLT = light.p - hr.p;
+       SlVector3 SrftoLT = light.p - hr.p;
         Ray shadowRay = Ray(hr.p, SrftoLT);
         normalize(shadowRay.d);
         shadow = BVHIntersection(BVHTreeRoot, shadowRay, shadowbias, mag(SrftoLT), dummy,
@@ -544,7 +544,8 @@ void Tracer::buildBVHTree() {
     BVHTreeRoot = BuildNode(surfaces);
 }
 
-
+// If shadowTest is true, the function will return immediately once it found an intersection, otherwise it loops
+// through all surfaces and find the nearest intersection
 bool Tracer::BVHIntersection(Node *nd, const Ray &r, double t0, double t1, HitRecord &hr, bool shadowTest) const {
     bool hit = false;
     HitRecord dummy;
@@ -573,8 +574,6 @@ bool Tracer::BVHIntersection(Node *nd, const Ray &r, double t0, double t1, HitRe
     }
     return hit;
 }
-
-
 
 
 int main(int argc, char *argv[]) {

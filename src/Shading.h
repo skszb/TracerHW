@@ -22,7 +22,6 @@ public:
         // specular
         SlVector3 revLDir = -lDir;
         SlVector3 Ks = hr.f.ks * hr.f.color;
-
         SlVector3 refLDir = revLDir + 2.0 * cosTheta * hr.n;
         color += Ks * pl.c * pow(std::max(dot(refLDir, hr.v), 0.0), hr.f.shine);
 
