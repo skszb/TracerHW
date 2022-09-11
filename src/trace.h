@@ -84,7 +84,15 @@ public:
 
 };
 
-struct Node {
+class Node {
+public:
+    Node() = default;
+    Node(Node &nd) {
+        box = nd.box;
+        lNode = nd.lNode;
+        rNode = nd.rNode;
+        sfs = nd.sfs;
+    }
     AABB *box;
     Node* lNode = nullptr;
     Node* rNode = nullptr;
@@ -118,33 +126,15 @@ public:
     SlVector3 shade(HitRecord &hr) const;
     void writeImage(const std::string &fname);
     void buildBVHTree();
-    bool traverseBVH();
+    bool BVHIntersection(Node* nd, const Ray &r, double t0, double t1, HitRecord &hr, bool shadowTest= false) const;
 
     bool color;
     int samples;
     double aperture;
     int maxraydepth;
     Node* BVHTreeRoot = nullptr;
-private:
-    bool BVHIntersection(const Node* nd, const Ray &r, double &t0, double &t1, HitRecord &hr) {
-        if (!nd) return false;
-        bool hit = false;
-        HitRecord dummy;
-        // hit bounding box
-        if (nd->box->intersect(r, t0, t1, dummy)) {
-            // in leaf node
-            if (nd->sfs.size() == 1) {
-                if (nd->box->intersect(r, t0, t1, hr)) {
-                    t1 = hr.t;
-                    return true;
-                }
-            }
 
-            hit = hit || BVHIntersection(nd->lNode, r, t0, t1, dummy);
-            hit = hit || BVHIntersection(nd->rNode, r, t0, t1, dummy);
-        }
-        return hit;
-    }
+private:
 };
 
 #endif

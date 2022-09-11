@@ -8,6 +8,7 @@
 #include <vector>
 #include <chrono>
 #include <cassert>
+#include <stack>
 
 #ifdef __APPLE__
 #define MAX std::numeric_limits<double>::max()
@@ -105,7 +106,7 @@ bool AABB::intersect(const Ray &r, double t0, double t1, HitRecord &hr) const {
     tmin = std::min(tmin, tzmin);
     tmax = std::max(tmax, tzmax);
 
-    if (tmin < t0 || tmax > t1) return false;
+    if (tmax < t0 || tmin > t1) return false;
     hr.t = tmin;
     return true;
 }
@@ -433,12 +434,8 @@ SlVector3 Tracer::shade(HitRecord &hr) const {
         SlVector3 SrftoLT = light.p - hr.p;
         Ray shadowRay = Ray(hr.p, SrftoLT);
         normalize(shadowRay.d);
-        for (const std::pair<Surface *, Fill> &sf: surfaces) {
-            if (sf.first->intersect(shadowRay, shadowbias, mag(SrftoLT), dummy)) {
-                shadow = true;
-                break;
-            }
-        }
+        shadow = BVHIntersection(BVHTreeRoot, shadowRay, shadowbias, mag(SrftoLT), dummy,
+                                 true);
 
         if (!shadow) {
             // Step 2 do shading here
@@ -464,21 +461,13 @@ SlVector3 Tracer::shade(HitRecord &hr) const {
 SlVector3 Tracer::trace(const Ray &r, double t0, double t1) const {
     HitRecord hr{};
     hr.t = MAX;
+    HitRecord debugHr; debugHr.t = MAX;
     SlVector3 color(bcolor);
 
     bool hit = false;
 
     // Step 1 See what a ray hits
-
-    for (const std::pair<Surface *, Fill> &sf: surfaces) {
-        if (sf.first->intersect(r, t0, t1, hr)) {
-            hit = true;
-            t1 = hr.t;
-            hr.f = sf.second;
-            hr.v = r.e - hr.p;
-            normalize(hr.v);
-        }
-    }
+    hit = BVHIntersection(BVHTreeRoot, r, t0, t1, hr);
 
     if (hit) {
         color = shade(hr);
@@ -555,9 +544,38 @@ void Tracer::buildBVHTree() {
     BVHTreeRoot = BuildNode(surfaces);
 }
 
-bool Tracer::traverseBVH() {
 
+bool Tracer::BVHIntersection(Node *nd, const Ray &r, double t0, double t1, HitRecord &hr, bool shadowTest) const {
+    bool hit = false;
+    HitRecord dummy;
+    std::stack<Node*> callStack;
+    callStack.push(nd);
+
+    while (!callStack.empty()) {
+        if (shadowTest && hit) return true;
+        Node *currNode = callStack.top();
+        callStack.pop();
+        if (currNode->box->intersect(r, t0, t1, dummy)) {
+            // in leaf node, check intersection with surface
+            if (currNode->sfs.size() == 1) {
+                auto p = currNode->sfs[0];
+                if (p.first->intersect(r, t0, t1, hr)) {
+                    hit = true;
+                    t1 = hr.t;
+                    hr.f = p.second;
+                    hr.v = r.e - hr.p;
+                    normalize(hr.v);
+                }
+            }
+            if (currNode->rNode) callStack.push(currNode->rNode);
+            if (currNode->lNode) callStack.push(currNode->lNode);
+        }
+    }
+    return hit;
 }
+
+
+
 
 int main(int argc, char *argv[]) {
     int c;
