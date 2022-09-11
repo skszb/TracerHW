@@ -431,7 +431,7 @@ SlVector3 Tracer::shade(HitRecord &hr) const {
         bool shadow = false;
 
         // Step 3 Check for shadows here
-       SlVector3 SrftoLT = light.p - hr.p;
+        SlVector3 SrftoLT = light.p - hr.p;
         Ray shadowRay = Ray(hr.p, SrftoLT);
         normalize(shadowRay.d);
         shadow = BVHIntersection(BVHTreeRoot, shadowRay, shadowbias, mag(SrftoLT), dummy,
