@@ -35,29 +35,29 @@ Required: an .nnf file as an input, outputs an .ppm file.
 I only used the **teapot** and the **balls** as my test cases of shading, shadow, 
 and reflection.
 
-<img src="D:\JUAN TMD\CIS\hw2\OutputFiles\_benchmark_teapot.png" width=45%></img>
-<img src="D:\JUAN TMD\CIS\hw2\OutputFiles\_benchmark_balls.png" width=45%></img>
+<img src="\OutputFiles\_benchmark_teapot.png" width=45%></img>
+<img src="\OutputFiles\_benchmark_balls.png" width=45%></img>
 
 ### My Outputs
 #### Basic shading
 
-<img src="D:\JUAN TMD\CIS\hw2\OutputFiles\teapot_shading.png" width=45%></img>
-<img src="D:\JUAN TMD\CIS\hw2\OutputFiles\balls_shading.png" width=45%></img>
+<img src="\OutputFiles\teapot_shading.png" width=45%></img>
+<img src="\OutputFiles\balls_shading.png" width=45%></img>
 
 #### Shading + shadow
 
-<img src="D:\JUAN TMD\CIS\hw2\OutputFiles\teapot_shading_shadow.png" width="45%"/></img>
-<img src="D:\JUAN TMD\CIS\hw2\OutputFiles\balls_shading_shadow.png" width="45%"/></img>
+<img src="\OutputFiles\teapot_shading_shadow.png" width="45%"/></img>
+<img src="\OutputFiles\balls_shading_shadow.png" width="45%"/></img>
 
 #### Shading + shadow + reflection
 
-<img src="D:\JUAN TMD\CIS\hw2\OutputFiles\teapot_shading_shadow_reflection.png" width="45%"/></img>
-<img src="D:\JUAN TMD\CIS\hw2\OutputFiles\balls_shading_shadow_reflection.png" width="45%"/></img>
+<img src="\OutputFiles\teapot_shading_shadow_reflection.png" width="45%"/></img>
+<img src="\OutputFiles\balls_shading_shadow_reflection.png" width="45%"/></img>
 
 #### Shading + shadow + reflection (more rays, num=5)
 
-<img src="D:\JUAN TMD\CIS\hw2\OutputFiles\teapot_shading_shadow_reflection_s5.png" width="45%"/></img>
-<img src="D:\JUAN TMD\CIS\hw2\OutputFiles\balls_shading_shadow_reflection_s5.png" width="45%"/></img>
+<img src="\OutputFiles\teapot_shading_shadow_reflection_s5.png" width="45%"/></img>
+<img src="\OutputFiles\balls_shading_shadow_reflection_s5.png" width="45%"/></img>
 
 ___
 
@@ -77,8 +77,8 @@ Teapot:     **433 seconds** (before) to **19 seconds** (after)
 
 Balls:      **975 seconds** (before) to **22 seconds** (after)
 
-<img src="D:\JUAN TMD\CIS\hw2\OutputFiles\teapot_shading_shadow_reflection.png" width="45%"/></img>
-<img src="D:\JUAN TMD\CIS\hw2\OutputFiles\balls_shading_shadow_reflection.png" width="45%"/></img>
+<img src="\OutputFiles\teapot_shading_shadow_reflection.png" width="45%"/></img>
+<img src="\OutputFiles\balls_shading_shadow_reflection.png" width="45%"/></img>
 
 ---
 
@@ -115,7 +115,7 @@ ___
 There was a picture rendered not realistically because of an error in 
 calculating reflection, but it was a good-looking one.
 
-<img src="D:\JUAN TMD\CIS\hw2\OutputFiles\_error_balls_reflection.png" width="100%"/></img>
+<img src="\OutputFiles\_error_balls_reflection.png" width="100%"/></img>
 
 ---
 
