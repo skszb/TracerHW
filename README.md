@@ -38,8 +38,7 @@ I used the **teapot** and the **balls** as my test cases of shading, shadow, and
 
 These files can be found at http://www.realtimerendering.com/resources/SPD/
 
-<img src="OutputFiles\_benchmark_teapot.png" width=45%></img>  
-<img src="OutputFiles\_benchmark_balls.png" width=45%></img>
+<img src="OutputFiles\_benchmark_teapot.png" width=45%></img>  <img src="OutputFiles\_benchmark_balls.png" width=45%></img>
 
 ### My Outputs
 #### Basic shading
