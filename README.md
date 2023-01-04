@@ -24,18 +24,21 @@ using axis-aligned bounding boxes)
 ### Usage
 The ray tracer takes 3 arguments, 2 required and 1 optional.
 
-Required: an .nnf file as an input, outputs an .ppm file.
+Required: a file of Neutral File Format as an input, outputs a file of Portable Pixmap Format. 
 
 (e.g. trace [opts] input.nff output.ppm)
+
+More information about Neutral File Format can be found at http://www.realtimerendering.com/resources/SPD/NFF.TXT
 
 ***
 
 ## Outputs:
 ### Benchmarks
-I only used the **teapot** and the **balls** as my test cases of shading, shadow, 
-and reflection.
+I used the **teapot** and the **balls** as my test cases of shading, shadow, and reflection.
 
-<img src="OutputFiles\_benchmark_teapot.png" width=45%></img>
+These files can be found at http://www.realtimerendering.com/resources/SPD/
+
+<img src="OutputFiles\_benchmark_teapot.png" width=45%></img>  
 <img src="OutputFiles\_benchmark_balls.png" width=45%></img>
 
 ### My Outputs

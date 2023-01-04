@@ -1,0 +1,16 @@
+Balls
+inputFiles/balls.nnf OutputFiles/ballsWithShadow.ppm
+
+Teapot
+inputFiles/teapot.nnf OutputFiles/teapotWithShadow.ppm
+
+
+BallsWithReflections    975s  22s       s3:69s  s5-112s
+inputFiles/balls.nnf OutputFiles/ballsWithReflections.ppm
+
+TeapotWithReflections   433s  19s       s5: 96s
+inputFiles/teapot.nnf OutputFiles/teapotWithReflections.ppm
+
+
+
+usage: trace [opts] input.nff output.ppm
