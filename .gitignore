@@ -1,0 +1,3 @@
+# CLion cache directory
+.idea/
+cmake-build-debug/

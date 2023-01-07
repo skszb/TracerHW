@@ -31,6 +31,11 @@ public:
 
         return color;
     }
+
+    static SlVector3 AshikhminShirleyBRDF(const Light &pl, const HitRecord &hr) {
+
+        return {};
+    }
 };
 
 

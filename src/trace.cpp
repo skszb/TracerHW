@@ -154,8 +154,9 @@ bool Triangle::intersect(const Ray &r, double t0, double t1, HitRecord &hr) cons
     }
 
     if (gamma < 0 || beta < 0 || beta + gamma > 1) return false;
+
+    // if hit, update the hit record
     if (t0 < t && t < t1) {
-        // if hit, update the hit record
         hr.beta = beta;
         hr.gamma = gamma;
         hr.alpha = 1 - beta - gamma;

@@ -26,7 +26,7 @@ The ray tracer takes 3 arguments, 2 required and 1 optional.
 
 Required: a file of Neutral File Format as an input, outputs a file of Portable Pixmap Format. 
 
-(e.g. trace [opts] input.nff output.ppm)
+(e.g. trace input.nff output.ppm)
 
 More information about Neutral File Format can be found at http://www.realtimerendering.com/resources/SPD/NFF.TXT
 
@@ -56,7 +56,7 @@ These files can be found at http://www.realtimerendering.com/resources/SPD/
 <img src="OutputFiles\teapot_shading_shadow_reflection.png" width="45%"/></img>
 <img src="OutputFiles\balls_shading_shadow_reflection.png" width="45%"/></img>
 
-#### Shading + shadow + reflection (more rays, num=5)
+#### Shading + shadow + reflection (more samples per pixel: num=5)
 
 <img src="OutputFiles\teapot_shading_shadow_reflection_s5.png" width="45%"/></img>
 <img src="OutputFiles\balls_shading_shadow_reflection_s5.png" width="45%"/></img>
